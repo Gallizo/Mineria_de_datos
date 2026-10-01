@@ -1,18 +1,10 @@
-"""Carga de datos: único sitio donde se define la ruta y las opciones de lectura del CSV."""
-import os
+from db_connection import url, propiedades
+#from empresas import empresas
 
-# Ruta relativa a este archivo (src/ -> ../data/), funciona se ejecute desde donde se ejecute
-RUTA_CSV = os.path.normpath(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "ibex35_close-2024.csv")
-)
-
-
-def cargar_datos(spark, ruta=RUTA_CSV):
-    """Lee el CSV del IBEX-35 y devuelve el DataFrame tal cual (todo en string)."""
-    return (
-        spark.read
-        .option("header", True)
-        .option("sep", ";")
-        .option("dateFormat", "dd/MM/yyyy")
-        .csv(ruta)
-    )
+def guardar_datos(df_original, df_final):
+    df_original.write.jdbc(url, "Datos2024", "overwrite", propiedades)
+    columnas = ["Dia"]
+    for cod in empresas:
+        columnas.append(cod)
+    df_final = df_final.select(columnas)
+    df_final.write.jdbc(url, "Datos2024", "overwrite", propiedades)
