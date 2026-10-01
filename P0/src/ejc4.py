@@ -1,20 +1,15 @@
-#Ej4 - Realizado con la asistencia de Gemini para el cálculo de cuartiles y asignación de rangos
+#Ej4 - Realizado con la asistencia de Claude para arreglar el bucle que calcula la variación de cada empresa y para crear el DataFrame
 print("Ej4")
 
-'''
-hay q arreglar este codigo y mirar a ver si el is not None se puede eliminar para q quede mejor
-tambien tengo q cambiar la descripcion del uso de ia
-'''
-
-
-#definir sesion
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 from pyspark.sql.window import *
 # Crear una SparkSession
 spark_session = (SparkSession.builder .appName("IBEX35") .getOrCreate()) 
-df = spark_session.read.option("header", True).option("sep", ";").option("dateFormat", "dd/MM/yyyy").csv("./ibex35_close-2024.csv")
+df = spark_session.read.option("header", True).option("sep", ";").option("dateFormat", "dd/MM/yyyy").csv("./data/ibex35_close-2024.csv")
+
+
 
 for i in df.columns:
     nuevas=i.replace(".MC", "")
@@ -32,8 +27,9 @@ for c in df.columns:
 
 var = []
 for emp in columnas_empresas:
-    val_ini = fila_inicial[emp]
-    val_fin = fila_final[emp]
+    filas_validas = df_ordenado.filter(col(emp).isNotNull())
+    val_ini = filas_validas.head(1)[0][emp] if filas_validas.head(1) else None
+    val_fin = filas_validas.tail(1)[0][emp] if filas_validas.head(1) else None
 
     if val_ini is not None and val_fin is not None:
         p_ini = float(val_ini)
@@ -53,13 +49,16 @@ for emp in columnas_empresas:
 
         var.append((emp, p_ini, p_fin, variacion, clasif))
 
-schema_resultado = ["Empresa", "Precio_Inicial", "Precio_Final", "Variacion_Anual", "Clasificacion"]
-resultado_df = spark_session.createDataFrame(var, schema=schema_resultado)
+schema_resultado = ["Empresa", "Precio_Inicial", "Precio_Final", "Variación Anual", "Clasificacion"]
+resultado_df = None
+for (emp, p_ini, p_fin, variacion, clasif) in var:
+    fila = spark_session.range(1).select(
+        lit(emp).alias(schema_resultado[0]),
+        lit(p_ini).alias(schema_resultado[1]),
+        lit(p_fin).alias(schema_resultado[2]),
+        lit(variacion).alias(schema_resultado[3]),
+        lit(clasif).alias(schema_resultado[4])
+    )
+    resultado_df = fila if resultado_df is None else resultado_df.union(fila)
 
-resultado_df.show(truncate=False)
-
-
-
-
-
-
+resultado_df.show(len(var), truncate=False)
