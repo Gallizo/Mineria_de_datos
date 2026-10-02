@@ -1,3 +1,4 @@
+#este archivo ha sido realizado con la asistencia de ChatGPT
 from data_loader import guardar_datos
 
 

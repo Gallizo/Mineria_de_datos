@@ -1,3 +1,4 @@
+#este archivo ha sido realizado con la asistencia de ChatGPT
 from db_connection import url, propiedades
 
 
