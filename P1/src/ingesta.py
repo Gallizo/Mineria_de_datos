@@ -85,3 +85,12 @@ def leer_sentimiento(spark, ruta_csv):
 def guardar_parquet(df, ruta, modo="overwrite"):
     """EJ1b/EJ2b/EJ2c: guardar Parquet, con overwrite o append."""
     df.write.mode(modo).parquet(ruta)
+
+
+"""EJ3 - Convertir Parquet a Delta"""
+from delta.tables import DeltaTable
+def convertir_parquet_a_delta(spark, ruta):
+    DeltaTable.convertToDelta(spark,f"parquet.`{ruta}`")
+
+
+
