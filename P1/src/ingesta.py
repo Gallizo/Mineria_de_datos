@@ -89,8 +89,8 @@ def guardar_parquet(df, ruta, modo="overwrite"):
 
 """EJ3 - Convertir Parquet a Delta"""
 from delta.tables import DeltaTable
-def convertir_parquet_a_delta(spark, ruta):
-    DeltaTable.convertToDelta(spark,f"parquet.`{ruta}`")
+def convertir_a_delta(spark, ruta):
+    DeltaTable.convertToDelta(spark, f"parquet.`{ruta}`")
 
 
 

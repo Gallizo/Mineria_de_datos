@@ -17,5 +17,12 @@ DeltaTable.forPath(spark, BRONZE_SENTIMIENTO).history().show()
 
 spark.stop()
 
+"""
+Dentro de las carpetas han aparecido un archivo json que registra la primera versión de la tabla.
+Al mostrar el historial con history() aparece la operación CONVERT, que confirma que ambas carpetas
+se han convertido a Delta. Se han procesado 561 archivos para IBEX y 2 para sentimiento.
 
+También han aparecido archivos de checkpoint que guardan información sobre el estado de las tablas
+y archivos .crc para comprobar su integridad
+"""
 
