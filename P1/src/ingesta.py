@@ -93,4 +93,12 @@ def convertir_a_delta(spark, ruta):
     DeltaTable.convertToDelta(spark, f"parquet.`{ruta}`")
 
 
+"""EJ4: insertar nuevas cotizaciones"""
+def insertar_nuevas_cotizaciones(tabla, nuevos):
+    (tabla.alias("d")
+        .merge(nuevos.alias("n"), "d.Ticker = n.Ticker AND d.Fecha = n.Fecha")
+        .whenNotMatchedInsertAll()
+        .execute())
+
+
 

@@ -11,7 +11,7 @@ from vista import titulo_ejercicio, mostrar_dataframe, comentar
 def ejecutar_clase1():
     spark = crear_spark_session()
     try:
-        # ==================== EJ1a ====================
+        # EJ1a
         titulo_ejercicio("EJ1a - Histórico de BBVA")
         df_bbva = descargar_historico(spark, "BBVA.MC", FECHA_INICIO, FECHA_FIN)
         mostrar_dataframe(df_bbva)
@@ -22,7 +22,7 @@ def ejecutar_clase1():
             "usamos 0.0 cuando no hay dividendos ni desdoblamientos."
         )
 
-        # ==================== EJ1b ====================
+        # EJ1b
         titulo_ejercicio("EJ1b - IBEX 35 en bronze")
         df_ibex = descargar_ibex(spark, TICKERS_IBEX, FECHA_INICIO, FECHA_FIN)
         guardar_parquet(df_ibex, BRONZE_IBEX, "overwrite")
@@ -30,7 +30,7 @@ def ejecutar_clase1():
         print("Filas descargadas:", df_ibex.count())
         print("Tickers con datos:", df_ibex.select("Ticker").distinct().count(), "de", len(TICKERS_IBEX))
 
-        # ==================== EJ1c (opcional) ====================
+        # EJ1c 
         titulo_ejercicio("EJ1c - Leer Parquet y column pruning (opcional)")
         df_leido = spark.read.parquet(BRONZE_IBEX)
         mostrar_dataframe(df_leido)
@@ -41,7 +41,7 @@ def ejecutar_clase1():
             "de las columnas del Parquet; se reduce la lectura de disco."
         )
 
-        # ==================== EJ2a ====================
+        # EJ2a
         titulo_ejercicio("EJ2a - Leer sentimiento CSV")
         df_sentimiento = leer_sentimiento(spark, CSV_SENTIMIENTO)
         mostrar_dataframe(df_sentimiento)
@@ -51,7 +51,7 @@ def ejecutar_clase1():
             "La limpieza y conversión de tipos se harán en Clase 3."
         )
 
-        # ==================== EJ2b ====================
+        # EJ2b
         titulo_ejercicio("EJ2b - Sentimiento en bronze")
         guardar_parquet(df_sentimiento, BRONZE_SENTIMIENTO, "overwrite")
         filas_iniciales = spark.read.parquet(BRONZE_SENTIMIENTO).count()
