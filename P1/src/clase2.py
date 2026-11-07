@@ -3,6 +3,7 @@ from spark_session import crear_spark_session
 from config import BRONZE_IBEX, TICKERS_IBEX
 from ingesta import descargar_ibex, insertar_nuevas_cotizaciones
 from datetime import date
+from pyspark.sql import functions as F
 
 
 spark = crear_spark_session()
@@ -52,6 +53,21 @@ Se descargaron 910 registros nuevos y al ejecutar el MERGE se insertaron los 910
 Al ejecutar el MERGE por segunda vez con los mismos datos, el numero de filas quedó igual, ya que
 evita insertar de nuevo los registros que ya existen
 """
+"""
+# EJ5a - Nueva columna
+df_ibex = spark.read.format("delta").load(BRONZE_IBEX)
+df_nuevo = df_ibex.withColumn("Close_mas5", F.col("Close") + 5)
+df_nuevo.write.format("delta").mode("append").save(BRONZE_IBEX)
+"""
+"""
+Al ejecutarlo se ha producido un error AnalysisException por incompatibilidad de esquema,
+esto es porque Delta Lake comprueba que los datos que se añaden sean compatibles, y por 
+defecto no deja añadir nuevas columnas automáticamente
+"""
+
+
+
+
 
 
 
