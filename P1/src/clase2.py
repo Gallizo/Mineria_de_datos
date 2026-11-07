@@ -1,7 +1,7 @@
 from delta.tables import DeltaTable
 from spark_session import crear_spark_session
 from config import BRONZE_IBEX, TICKERS_IBEX
-from ingesta import descargar_ibex, insertar_nuevas_cotizaciones
+from ingesta import descargar_ibex, insertar_nuevas_cotizaciones, eliminar_ticker
 from datetime import date
 from pyspark.sql import functions as F
 
@@ -64,11 +64,40 @@ Al ejecutarlo se ha producido un error AnalysisException por incompatibilidad de
 esto es porque Delta Lake comprueba que los datos que se añaden sean compatibles, y por 
 defecto no deja añadir nuevas columnas automáticamente
 """
+"""
+# EJ5b - Cambiar option
+df_ibex = spark.read.format("delta").load(BRONZE_IBEX)
+df_nuevo = df_ibex.withColumn("Close_mas5", F.col("Close") + 5)
+df_nuevo.write.format("delta").mode("append").option("mergeSchema", "true").save(BRONZE_IBEX)
+"""
+"""
+Delta Lake no ha rechazado la operación, ya que esta opción permite añadir nuevas columnas
+al esquema de la tabla
+"""
+"""
+# EJ5c - eliminar filas del ticker BBVA
+tabla_ibex = DeltaTable.forPath(spark, BRONZE_IBEX)
+print("BBVA antes del DELETE:")
+bbva_antes = tabla_ibex.toDF().filter("Ticker = 'BBVA.MC'")
+bbva_antes.show(5)
+print("Número de filas:", bbva_antes.count())
 
+eliminar_ticker(tabla_ibex, "BBVA.MC")
 
-
-
-
+print("BBVA después del DELETE:")
+bbva_despues = spark.read.format("delta").load(BRONZE_IBEX).filter("Ticker = 'BBVA.MC'")
+bbva_despues.show(5)
+print("Número de filas:", bbva_despues.count())
+"""
+"""
+# EJ5d - Historial
+tabla_ibex = DeltaTable.forPath(spark, BRONZE_IBEX)
+tabla_ibex.history().show()
+df_anterior = spark.read.format("delta").option("versionAsOf", 1).load(BRONZE_IBEX)
+print("Filas de la versión 1:", df_anterior.count())
+df_anterior.filter("Ticker = 'BBVA.MC'").show(5)
+df_anterior.printSchema()
+"""
 
 
 

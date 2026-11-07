@@ -101,4 +101,7 @@ def insertar_nuevas_cotizaciones(tabla, nuevos):
         .execute())
 
 
+"""EJ5c: eliminar ticker de una empresa"""
+def eliminar_ticker(tabla, ticker):
+    tabla.delete(f"Ticker = '{ticker}'")
 
