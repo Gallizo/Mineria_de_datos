@@ -105,3 +105,8 @@ def insertar_nuevas_cotizaciones(tabla, nuevos):
 def eliminar_ticker(tabla, ticker):
     tabla.delete(f"Ticker = '{ticker}'")
 
+
+"""EJ7: Obtener información de una empresa"""
+def obtener_info_empresa(ticker):
+    return yf.Ticker(ticker).info
+
