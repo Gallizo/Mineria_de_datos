@@ -22,3 +22,5 @@ TICKERS_IBEX = [
     "GRF.MC", "FDR.MC", "SLR.MC", "ROVI.MC", "LOG.MC", "IDR.MC", "PUIG.MC",
     "COL.MC", "MRL.MC",
 ]
+
+SILVER_SENTIMIENTO = PROYECTO_DIR / "data" / "lake" / "silver" / "sentimiento"

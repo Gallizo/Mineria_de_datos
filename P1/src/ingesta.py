@@ -1,7 +1,7 @@
 """MODELO (M): descarga, lectura y guardado de datos."""
 from datetime import datetime, timedelta
 import warnings
-
+from pyspark.sql import functions as F
 import pandas as pd
 import yfinance as yf
 from pyspark.sql.types import (
@@ -110,3 +110,16 @@ def eliminar_ticker(tabla, ticker):
 def obtener_info_empresa(ticker):
     return yf.Ticker(ticker).info
 
+
+
+"""EJ8: Limpiar datos de sentimiento"""
+
+def limpiar_sentimiento(df):
+    df = df.withColumn("Fecha", F.to_date("Fecha"))
+    df = df.withColumn("Sector", F.lower(F.trim(F.col("Sector"))))
+    df = df.withColumn("Sentimiento", F.regexp_replace(F.col("Sentimiento"), ",", ".").cast("double"))
+
+    df = df.dropna()
+    df = df.dropDuplicates(["Fecha", "Sector"])
+
+    return df
