@@ -111,15 +111,56 @@ def obtener_info_empresa(ticker):
     return yf.Ticker(ticker).info
 
 
-
 """EJ8: Limpiar datos de sentimiento"""
-
 def limpiar_sentimiento(df):
     df = df.withColumn("Fecha", F.to_date("Fecha"))
     df = df.withColumn("Sector", F.lower(F.trim(F.col("Sector"))))
     df = df.withColumn("Sentimiento", F.regexp_replace(F.col("Sentimiento"), ",", ".").cast("double"))
-
     df = df.dropna()
     df = df.dropDuplicates(["Fecha", "Sector"])
-
     return df
+
+
+"""EJ9: Limpiar cotizaciones del IBEX"""
+def limpiar_ibex(df):
+    df = df.dropna(subset=["Close", "Ticker", "Fecha"])
+    df = df.dropDuplicates(["Ticker", "Fecha"])
+    return df
+
+
+def obtener_sectores_ibex(tickers):
+    sectores = []
+    for ticker in tickers:
+        info = obtener_info_empresa(ticker)
+        sectores.append((ticker, info.get("sector")))
+
+    return sectores
+
+
+def limpiar_sectores(df):
+    df = df.withColumn("Sector", F.lower(F.trim(F.col("Sector"))))
+    df = df.dropna(subset=["Ticker", "Sector"])
+    df = df.dropDuplicates(["Ticker"])
+    return df
+
+
+"""EJ10: Integración de datos"""
+def unir_ibex_sectores(df_ibex, df_sectores):
+    df = df_ibex.join(df_sectores, on="Ticker", how="left")
+    return df
+
+
+def unir_con_sentimiento(df_ibex_sectores, df_sentimiento):
+    df = df_ibex_sectores.join(
+        df_sentimiento,
+        on=["Fecha", "Sector"],
+        how="left"
+    )
+    return df
+
+
+
+
+
+
+
