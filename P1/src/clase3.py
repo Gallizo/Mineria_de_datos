@@ -1,6 +1,6 @@
 from spark_session import crear_spark_session
 from config import BRONZE_SENTIMIENTO, SILVER_SENTIMIENTO, BRONZE_IBEX, SILVER_IBEX, BRONZE_SECTORES, SILVER_SECTORES, GOLD_IBEX_SENTIMIENTO
-from ingesta import obtener_info_empresa, limpiar_sentimiento, limpiar_ibex, obtener_sectores_ibex, limpiar_sectores, unir_ibex_sectores, unir_con_sentimiento
+from ingesta import obtener_info_empresa, limpiar_sentimiento, limpiar_ibex, obtener_sectores_ibex, limpiar_sectores, unir_ibex_sectores, unir_con_sentimiento, obtener_ibex_sin_sentimiento, calcular_variacion
 
 spark = crear_spark_session()
 
@@ -41,11 +41,23 @@ df_sentimiento = spark.read.format("delta").load(str(SILVER_SENTIMIENTO))
 
 df_ibex_sectores = unir_ibex_sectores(df_ibex, df_sectores)
 df_gold = unir_con_sentimiento(df_ibex_sectores, df_sentimiento)
-df_gold.write.format("delta").mode("overwrite").save(str(GOLD_IBEX_SENTIMIENTO))
+#df_gold.write.format("delta").mode("overwrite").save(str(GOLD_IBEX_SENTIMIENTO))
 
 print("Filas Gold:", df_gold.count())
 df_gold.select("Fecha", "Ticker", "Sector", "Close", "Sentimiento").show(5)
 
+"""
+# EJ11 - Detectar registros sin sentimiento mediante anti-join
+df_sin_sentimiento = obtener_ibex_sin_sentimiento(df_ibex_sectores, df_sentimiento)
+print("Filas sin sentimiento:", df_sin_sentimiento.count())
+df_sin_sentimiento.select("Fecha", "Ticker", "Sector", "Close").show(5)
+"""
+
+# EJ12 - Añadir columna de variación
+df_gold_variacion = calcular_variacion(df_gold)
+df_gold_variacion.write.format("delta").mode("overwrite").option("overwriteSchema", "true").save(str(GOLD_IBEX_SENTIMIENTO))
+print("Filas Gold enriquecidas:", df_gold_variacion.count())
+df_gold_variacion.select("Ticker", "Open", "Close", "Variacion_Pct").show(5)
 
 
 

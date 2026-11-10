@@ -159,7 +159,20 @@ def unir_con_sentimiento(df_ibex_sectores, df_sentimiento):
     return df
 
 
+"""EJ11 - Detectar cotizaciones sin sentimiento"""
+def obtener_ibex_sin_sentimiento(df_ibex_sectores, df_sentimiento):
+    df = df_ibex_sectores.join(
+        df_sentimiento,
+        on=["Fecha", "Sector"],
+        how="left_anti"
+    )
+    return df
 
+
+"""EJ12: Calcular la variación porcentual de cada día"""
+def calcular_variacion(df):
+    df = df.withColumn("Variacion_Pct", F.round((F.col("Close") - F.col("Open")) / F.col("Open") * 100, 2))
+    return df
 
 
 
