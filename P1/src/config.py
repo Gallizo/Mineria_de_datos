@@ -28,5 +28,5 @@ SILVER_IBEX = PROYECTO_DIR / "data" / "lake" / "silver" / "ibex"
 BRONZE_SECTORES = PROYECTO_DIR / "data" / "lake" / "bronze" / "sectores_ibex"
 SILVER_SECTORES = PROYECTO_DIR / "data" / "lake" / "silver" / "sectores_ibex"
 GOLD_IBEX_SENTIMIENTO = PROYECTO_DIR / "data" / "lake" / "gold" / "ibex_sentimiento"
-
+GOLD_PARQUET = PROYECTO_DIR / "data" / "lake" / "gold" / "ibex_sentimiento_parquet"
 
