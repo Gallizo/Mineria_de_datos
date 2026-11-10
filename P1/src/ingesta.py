@@ -168,10 +168,20 @@ def obtener_ibex_sin_sentimiento(df_ibex_sectores, df_sentimiento):
     )
     return df
 
+def obtener_sentimiento_sin_precios(df_sentimiento, df_ibex_sectores):
+    df = df_sentimiento.join(
+        df_ibex_sectores,
+        on=["Fecha", "Sector"],
+        how="left_anti"
+    )
+    return df
+
+
 
 """EJ12: Calcular la variación porcentual de cada día"""
 def calcular_variacion(df):
     df = df.withColumn("Variacion_Pct", F.round((F.col("Close") - F.col("Open")) / F.col("Open") * 100, 2))
+    df = df.withColumn("Rango_Diario", F.round(F.col("High") - F.col("Low"), 2))
     return df
 
 
