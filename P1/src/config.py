@@ -30,3 +30,6 @@ SILVER_SECTORES = PROYECTO_DIR / "data" / "lake" / "silver" / "sectores_ibex"
 GOLD_IBEX_SENTIMIENTO = PROYECTO_DIR / "data" / "lake" / "gold" / "ibex_sentimiento"
 GOLD_PARQUET = PROYECTO_DIR / "data" / "lake" / "gold" / "ibex_sentimiento_parquet"
 
+
+EXPORT_HECHOS = PROYECTO_DIR / "data" / "export" / "p2" / "hechos"
+EXPORT_DIM_EMPRESA = PROYECTO_DIR / "data" / "export" / "p2" / "dim_empresa"
