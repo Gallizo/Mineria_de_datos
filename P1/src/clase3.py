@@ -4,7 +4,7 @@ from ingesta import obtener_info_empresa, limpiar_sentimiento, limpiar_ibex, obt
 
 spark = crear_spark_session()
 
-"""
+
 # EJ7 - Investigar información de Yahoo Finance
 info = obtener_info_empresa("BBVA.MC")
 print("Empresa:", info.get("longName"))
@@ -62,7 +62,7 @@ df_gold_variacion.write.format("delta").mode("overwrite").option("overwriteSchem
 print("Filas Gold enriquecidas:", df_gold_variacion.count())
 df_gold_variacion.select("Fecha", "Ticker", "Open", "High", "Low", "Close", "Variacion_Pct", "Rango_Diario").show(5)
 
-"""
+
 # EJ13 - Exportar la capa Gold a Parquet
 df_gold = spark.read.format("delta").load(str(GOLD_IBEX_SENTIMIENTO))
 df_gold.write.format("parquet").mode("overwrite").save(str(GOLD_PARQUET))
