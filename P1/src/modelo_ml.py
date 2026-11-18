@@ -6,6 +6,8 @@ from sklearn.metrics import davies_bouldin_score
 import mlflow
 import numpy as np
 from hyperopt import fmin, hp, tpe, STATUS_OK
+from pyspark.sql import functions as F
+from delta.tables import DeltaTable
 
 
 """ej1"""
@@ -77,11 +79,30 @@ def mostrar_runs_mlflow(nombre_experimento):
             f"k: {run['params.k']} | "
             f"Seed modelo: {run['params.seed_modelo']} | "
             f"Seed Hyperopt: {run['params.seed_hyperopt']} | "
-            f"Davies-Bouldin: {run['metrics.davies_bouldin']:.4f}"
-        )
+            f"Davies-Bouldin: {run['metrics.davies_bouldin']:.4f}")
 
 
 
+"""ej4"""
+def guardar_features(df, ruta, version):
+    spark = df.sparkSession
+    # Evitar guardar dos veces la misma versión
+    if DeltaTable.isDeltaTable(spark, str(ruta)):
+        guardadas = spark.read.format("delta").load(str(ruta))
+        if guardadas.filter(F.col("version") == version).limit(1).count() > 0:
+            print(f"EJ4 - La versión {version} ya está guardada")
+            return
+
+    (
+        df.withColumn("Ticker", F.lit("BBVA.MC"))
+        .withColumn("version", F.lit(version))
+        .write.format("delta")
+        .mode("append")
+        .save(str(ruta))
+    )
+    print(f"EJ4 - Versión {version} guardada correctamente")
 
 
+def recuperar_features(spark, ruta, version):
+    return (spark.read.format("delta").load(str(ruta)).filter(F.col("version") == version).select("Fecha", "Open", "Close"))
 
