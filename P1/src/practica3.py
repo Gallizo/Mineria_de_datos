@@ -1,7 +1,7 @@
 from spark_session import crear_spark_session
 from config import GOLD_IBEX_SENTIMIENTO
 from pyspark.sql import functions as F
-from modelo_ml import crear_pipeline_kmeans, evaluar_kmeans
+from modelo_ml import crear_pipeline_kmeans, evaluar_kmeans, buscar_mejor_k_hyperopt, mostrar_runs_mlflow
 from pathlib import Path
 import mlflow
 
@@ -10,6 +10,7 @@ spark = crear_spark_session()
 
 
 """Ejercicio 1: KMeans con las cotizaciones de BBVA"""
+"""
 K = 6
 SEED = 42
 
@@ -44,6 +45,30 @@ with mlflow.start_run():
 
     print("EJ1 - Registrado en MLflow")
     print("EJ1 - Run ID:", mlflow.active_run().info.run_id)
+"""
+
+
+"""Ejercicio 2: Búsqueda automática de clusters con Hyperopt"""
+"""
+mlflow.set_experiment("Practica3_BBVA_Hyperopt")
+mejor_k = buscar_mejor_k_hyperopt(df_bbva)
+print("EJ2 - Mejor número de clusters:", mejor_k)
+"""
+
+"""Ejercicio 3: """
+print("EJ3 - Entrenamientos ordenados por Davies-Bouldin:")
+mostrar_runs_mlflow("Practica3_BBVA_Hyperopt")
+
+
+
+
+
+
+
+
+
+
+
 
 
 spark.stop()
