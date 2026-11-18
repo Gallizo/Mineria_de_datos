@@ -9,7 +9,8 @@ from modelo_ml import (
     buscar_mejor_k_hyperopt,
     mostrar_runs_mlflow,
     guardar_features,
-    recuperar_features
+    recuperar_features,
+    comparar_experimentos
 )
 
 
@@ -17,7 +18,6 @@ spark = crear_spark_session()
 
 
 """Ejercicio 1: KMeans con las cotizaciones de BBVA"""
-"""
 K = 6
 SEED = 42
 
@@ -52,21 +52,19 @@ with mlflow.start_run():
 
     print("EJ1 - Registrado en MLflow")
     print("EJ1 - Run ID:", mlflow.active_run().info.run_id)
-"""
+
 
 
 """Ejercicio 2: Búsqueda automática de clusters con Hyperopt"""
-"""
 mlflow.set_experiment("Practica3_BBVA_Hyperopt")
 mejor_k = buscar_mejor_k_hyperopt(df_bbva)
 print("EJ2 - Mejor número de clusters:", mejor_k)
-"""
+
 
 """Ejercicio 3: Consultar los entrenamientos de MLflow"""
-"""
 print("EJ3 - Entrenamientos ordenados por Davies-Bouldin:")
 mostrar_runs_mlflow("Practica3_BBVA_Hyperopt")
-"""
+
 
 """Ejercicio 4: Versionado de características"""
 # Recuperar los datos del BBVA
@@ -101,8 +99,26 @@ podemos reproducir y comparar los resultados.
 """
 
 
+"""Ejercicio 5: Hyperopt con Santander"""
+ruta_bd = Path(__file__).resolve().parent.parent / "mlflow.db"
+mlflow.set_tracking_uri(f"sqlite:///{ruta_bd.as_posix()}")
 
+df_gold = spark.read.format("delta").load(str(GOLD_IBEX_SENTIMIENTO))
+df_santander = (df_gold.filter(F.col("Ticker") == "SAN.MC").select("Fecha", "Open", "Close").dropna())
+mlflow.set_experiment("Practica3_Santander_Hyperopt")
+mejor_k_santander = buscar_mejor_k_hyperopt(df_santander)
+print("EJ5 - Mejor número de clusters de Santander:", mejor_k_santander)
 
+print("EJ5 - Comparación de experimentos:")
+comparar_experimentos()
+
+"""
+Separar los entrenamientos en experimentos de MLflow permite organizar y comparar
+los resultados de distintas empresas. En este caso, el mejor KMeans para BBVA
+utiliza 6 clusters, mientras que para Santander utiliza 5.
+Así podemos analizar el mismo algoritmo sobre datos diferentes sin mezclar sus
+parámetros, métricas y ejecuciones
+"""
 
 
 

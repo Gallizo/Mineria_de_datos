@@ -106,3 +106,31 @@ def guardar_features(df, ruta, version):
 def recuperar_features(spark, ruta, version):
     return (spark.read.format("delta").load(str(ruta)).filter(F.col("version") == version).select("Fecha", "Open", "Close"))
 
+
+
+
+"""ej5"""
+def comparar_experimentos():
+    print("EJ5 - Experimentos disponibles:")
+    for experimento in mlflow.search_experiments():
+        print(f"\nExperimento: {experimento.name}")
+        runs = mlflow.search_runs(experiment_ids=[experimento.experiment_id])
+        if runs.empty:
+            print("Sin ejecuciones")
+            continue
+        # Davies-Bouldin se minimiza; Silhouette se maximiza.
+        if "metrics.davies_bouldin" in runs.columns:
+            metrica = "metrics.davies_bouldin"
+            ascendente = True
+        elif "metrics.silhouette" in runs.columns:
+            metrica = "metrics.silhouette"
+            ascendente = False
+        else:
+            print("Sin métricas de evaluación")
+            continue
+
+        mejor = runs.sort_values(by=metrica, ascending=ascendente).iloc[0]
+        print("Mejor Run ID:", mejor["run_id"])
+        print("Clusters:", mejor.get("params.k", "N/D"))
+        print(f"{metrica}: {mejor[metrica]:.4f}")
+
